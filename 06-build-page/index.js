@@ -19,6 +19,13 @@ async function recursiveCopy(source, target) {
 
 async function buildWebPage() {
   const distFolder = path.join(__dirname, 'project-dist');
+  try {
+    await fs.access(distFolder);
+    await fs.rm(distFolder, { recursive: true });
+  } catch (error) {
+    // Ignore error if folder doesn't exist
+  }
+
   const templatePath = path.join(__dirname, 'template.html');
   const stylesFolder = path.join(__dirname, 'styles');
   const assetsFolder = path.join(__dirname, 'assets');
@@ -41,7 +48,6 @@ async function buildWebPage() {
       }
     }
     await fs.writeFile(indexPath, templateContent);
-
     const styles = await Promise.all(
       (await fs.readdir(stylesFolder))
         .filter(file => file.endsWith('.css'))
