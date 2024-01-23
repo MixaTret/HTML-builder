@@ -5,8 +5,11 @@ const destDir = path.join(__dirname, 'files-copy');
 
 async function copyDir() {
   await fs.mkdir(destDir, { recursive: true });
-  const files = await fs.readdir(srcDir);
-  await Promise.all(files.map(async file => {
+  const srcFiles = await fs.readdir(srcDir);
+  const destFiles = await fs.readdir(destDir);
+  const filesToRemove = destFiles.filter(file => !srcFiles.includes(file));
+  await Promise.all(filesToRemove.map(file => fs.unlink(path.join(destDir, file))));
+  await Promise.all(srcFiles.map(async file => {
     let srcPath = path.join(srcDir, file);
     let destPath = path.join(destDir, file);
     let stat = await fs.stat(srcPath);
